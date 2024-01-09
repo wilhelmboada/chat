@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: liquibase
+      contextFilter: main
+      labels: "baseline"
+      changes:
+        - tagDatabase:
+            tag: v1
+        - comment: Create user ids table
+        - sql:
+            dbms: "postgresql"
+            endDelimiter: \nGO
+            splitStatements: true
+            sql: |            
+              -- Create Users Table
+              CREATE TABLE users (
+                user_id SERIAL PRIMARY KEY,
+                user_name VARCHAR(255) NOT NULL
+              );
+              
+              -- Create Conversation Table
+              CREATE TABLE conversations (
+                conversation_id SERIAL PRIMARY KEY
+              );
+              
+              CREATE TABLE users_conversations (
+                user_id INT,
+                conversation_id INT,
+                FOREIGN KEY (user_id) REFERENCES Users(user_id),
+                FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id),
+                PRIMARY KEY (user_id, conversation_id)
+              );
+              
+              -- Create Message Table
+              CREATE TABLE messages (
+                  message_id SERIAL PRIMARY KEY,
+                  conversation_id INT,
+                  user_id INT,
+                  text TEXT NOT NULL,
+                  FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id),
+                  FOREIGN KEY (user_id) REFERENCES users(user_id)
+              );
+            stripComments: true
